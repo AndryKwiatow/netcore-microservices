@@ -1,0 +1,89 @@
+﻿version: "3.5"
+
+services:
+  consul:
+    image: consul:1.9.10
+    container_name: service-discovery
+    restart: always
+    ports:
+    - 8500:8500
+    networks:
+    - aforo255
+  fabio:
+    image: fabiolb/fabio:1.5.15-go1.15.5
+    container_name: service-balancer
+    environment:
+    - FABIO_REGISTRY_CONSUL_ADDR=service-discovery:8500
+    ports:
+    - 9998:9998
+    - 9999:9999
+    networks:
+    - aforo255
+    depends_on:
+    - consul
+  config:
+    image: nacos/nacos-server:v2.0.3
+    container_name: service-config 
+    environment:
+    - MODE=standalone
+    ports:
+    - 8848:8848
+    networks:
+    - aforo255
+  rabbitmq:
+    image: rabbitmq:3.8.13-management
+    container_name: service-event
+    environment:
+      - RABBITMQ_DEFAULT_USER=aforo255
+      - RABBITMQ_DEFAULT_PASS=aforo255
+    ports:
+    - 5672:5672
+    - 15672:15672
+    networks:
+    - aforo255  
+  tracer:
+    image: jaegertracing/all-in-one:1.28
+    container_name: service-tracer
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+    - 5775:5775/udp
+    - 6831:6831/udp
+    - 6832:6832/udp
+    - 5778:5778
+    - 16686:16686
+    - 14268:14268
+    - 9411:9411
+    networks:
+    - aforo255  
+  metrics:
+    image: prom/prometheus:v2.31.1
+    container_name: service-metrics
+    ports:
+    - 9090:9090
+    networks:
+    - aforo255
+    volumes:
+    - C:/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  analytics:
+    image: grafana/grafana:8.2.3
+    container_name: service-analytics
+    ports:
+    - 3000:3000
+    networks:
+    - aforo255
+    depends_on:
+    - metrics
+  log:
+    image: datalust/seq:2021.3
+    container_name: service-log
+    ports:
+    - 5341:80
+    environment:
+    - ACCEPT_EULA=Y
+    networks:
+    - aforo255
+
+networks:
+  aforo255:
+    name: micro
