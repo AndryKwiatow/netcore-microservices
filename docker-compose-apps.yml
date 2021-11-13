@@ -1,0 +1,62 @@
+﻿version: "3.5"
+
+services:
+  gateway:
+    image: andrykwiatow/aforo255-gateway-api
+    container_name: gateway-service
+    restart: always
+    ports:
+      - 9001:8080
+    networks:
+      - aforo255
+  account:
+    image: andrykwiatow/aforo255-api-account
+    container_name: account-service
+    restart: always
+    ports:
+      - 9002:8080
+    networks:
+      - aforo255
+  deposit:
+    image: andrykwiatow/aforo255-api-deposit
+    container_name: deposit-service
+    restart: always
+    ports:
+      - 9003:8080
+    networks:
+      - aforo255
+  history:
+    image: andrykwiatow/aforo255-api-history
+    container_name: history-service
+    restart: always
+    ports:
+      - 9004:8080
+    networks:
+      - aforo255
+  notification:
+    image: andrykwiatow/aforo255-api-notification
+    container_name: notification-service
+    restart: always
+    ports:
+      - 9005:8080
+    networks:
+      - aforo255
+  security:
+    image: andrykwiatow/aforo255-api-security
+    container_name: security-service
+    restart: always
+    ports:
+      - 9006:8080
+    networks:
+      - aforo255
+  withdrawal:
+    image: andrykwiatow/aforo255-api-withdrawal
+    container_name: withdrawal-service
+    restart: always
+    ports:
+      - 9007:8080
+    networks:
+      - aforo255
+networks:
+  aforo255:
+    name: micro
